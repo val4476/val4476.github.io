@@ -1,1 +1,417 @@
-# val4476.github.io
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jeux Interactifs</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        .card h2 {
+            color: #667eea;
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .card p {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .difficulty-card.facile {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        }
+
+        .difficulty-card.moyen {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+        }
+
+        .difficulty-card.difficile {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+        }
+
+        .question-card {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .question-card h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .question-card .question-text {
+            font-size: 1.3em;
+            color: #333;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .back-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+
+        .back-btn:hover {
+            background: #764ba2;
+            transform: scale(1.05);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+        }
+
+        .fullscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: black;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .fullscreen img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .timer {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background: rgba(102, 126, 234, 0.95);
+            color: white;
+            font-size: 3em;
+            font-weight: bold;
+            padding: 20px 40px;
+            border-radius: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+            z-index: 10000;
+        }
+        .fullscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: black;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .fullscreen img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .timer {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background: rgba(102, 126, 234, 0.95);
+            color: white;
+            font-size: 3em;
+            font-weight: bold;
+            padding: 20px 40px;
+            border-radius: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+            z-index: 10000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 id="title">Selectionnez le jeu</h1>
+        
+        <!-- Menu principal -->
+        <div id="mainMenu" class="grid">
+            <div class="card" onclick="startQuiz()">
+                <h2>🎯 Quiz</h2>
+                <p>Testez vos connaissances</p>
+            </div>
+            <div class="card" onclick="showMemoryGame()">
+                <h2>🧠 Mémoire</h2>
+                <p>Mémorisez les personnages en 30s</p>
+            </div>
+        </div>
+        
+        <!-- Quiz - Thématiques -->
+        <div id="themes" class="grid hidden">
+            <div class="card" onclick="selectTheme('Fantaisie')">
+                <h2>Fantaisie</h2>
+                <p>Ouuuh magiques, mythiques ou surnaturels !!</p>
+            </div>
+            <div class="card" onclick="selectTheme('anime')">
+                <h2>Héros en jaune…</h2>
+                <p>Univers hauts en couleur</p>
+            </div>
+            <div class="card" onclick="selectTheme('feuilleton')">
+                <h2>Le feuilleton moderne</h2>
+                <p>Vue et revue</p>
+            </div>
+            <div class="card" onclick="selectTheme('Culture')">
+                <h2>Cultissime</h2>
+                <p>Easy ou pas</p>
+            </div>
+        </div>
+
+        <!-- Quiz - Difficulté -->
+        <div id="difficulty" class="grid hidden">
+            <div class="card difficulty-card facile" onclick="selectDifficulty('facile')">
+                <h2>😊 Facile</h2>
+                <p>Pour débuter en douceur</p>
+            </div>
+            <div class="card difficulty-card moyen" onclick="selectDifficulty('moyen')">
+                <h2>🤔 Moyen</h2>
+                <p>Un défi équilibré</p>
+            </div>
+            <div class="card difficulty-card difficile" onclick="selectDifficulty('difficile')">
+                <h2>🔥 Difficile</h2>
+                <p>Pour les experts</p>
+            </div>
+        </div>
+
+        <!-- Quiz - Question -->
+        <div id="question" class="hidden">
+            <div class="question-card">
+                <span class="badge" id="themeBadge"></span>
+                <span class="badge" id="difficultyBadge"></span>
+                <h2>Question</h2>
+                <div class="question-text" id="questionText"></div>
+                <button class="back-btn" onclick="goBackToMenu()">← Retour au menu</button>
+            </div>
+        </div>
+
+        <!-- Jeu Mémoire -->
+        <div id="memoryGame" class="hidden">
+            <div class="question-card">
+                <h2>🧠 Jeu de Mémoire</h2>
+                <p style="color: #666; margin-bottom: 30px;">Une grille avec 30 personnages va etre afficher, le but est de mémorisez tous les personnages, chacun sont tour vous devez dire un personnages, un oublie perdu, une erreur perdu.</p>
+                
+                <div id="memoryTimer" class="hidden" style="font-size: 2em; color: #667eea; font-weight: bold; text-align: center; margin: 20px 0;">30</div>
+                
+                <div id="memoryImageContainer" class="hidden" style="margin: 30px 0; text-align: center;">
+                    <img id="memoryImg" src="" alt="Image à mémoriser" style="max-width: 100%; border-radius: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.3);">
+                </div>
+                
+                <div style="text-align: center;">
+                    <button class="back-btn" id="launchBtn" onclick="launchMemory()">▶️ PLAY !</button>
+                    <button class="back-btn" onclick="goBackToMenu()">← Retour au menu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentTheme = '';
+        let currentDifficulty = '';
+        let timerInterval = null;
+
+        const questions = {
+            'Fantaisie': {
+                'facile': "Dans quel univers fantastique un petit groupe composé d’un roi, d’un magicien, d’un elfe, d’un nain....",
+                'moyen': "Harry Potter - Quel sort permet d’ouvrir une porte ou un coffre verrouillé ?",
+                'difficile': "Seigneur des Anneaux - Quel est le véritable nom de Gollum avant qu’il ne devienne corrompu par l’Anneau ?"
+            },
+            'anime': {
+                'facile': "Bob l’Éponge - Comment s’appelle l’animal de compagnie de Bob l’Éponge ?",
+                'moyen': "Les Simpson - Comment s’appelle la ville où vivent Les Simpson ?",
+                'difficile': "Futurama - Quel est le métier de Leela au sein de l’équipage du Planet Express ?"
+            },
+            'feuilleton': {
+                'facile': "Friends - Quel est le métier de Ross ?",
+                'moyen': "Breaking Bad - Quel est le pseudonyme utilisé par Walter White ?",
+                'difficile': "Malcom - Quel est le nom de la première petite amie de Malcolm ?"
+            },
+            'Culture': {
+                'facile': "Top Gun - Quel est le prénom du personnage principal joué par Tom Cruise ?",
+                'moyen': "Philadelphia - Quelle maladie est au centre du conflit professionnel d'Andrew Beckett ?",
+                'difficile': "Dans quel film de science-fiction de 1999 un homme découvre que la réalité n’est qu’une simulation ?"
+            }
+        };
+
+        function startQuiz() {
+            document.getElementById('mainMenu').classList.add('hidden');
+            document.getElementById('themes').classList.remove('hidden');
+            document.getElementById('title').textContent = 'Choisissez une thématique';
+        }
+
+        function showMemoryGame() {
+            document.getElementById('mainMenu').classList.add('hidden');
+            document.getElementById('memoryGame').classList.remove('hidden');
+            document.getElementById('title').classList.add('hidden');
+        }
+
+        function selectTheme(theme) {
+            currentTheme = theme;
+            document.getElementById('themes').classList.add('hidden');
+            document.getElementById('difficulty').classList.remove('hidden');
+            document.getElementById('title').textContent = 'Choisissez la difficulté';
+        }
+
+        function selectDifficulty(difficulty) {
+            currentDifficulty = difficulty;
+            document.getElementById('difficulty').classList.add('hidden');
+            document.getElementById('question').classList.remove('hidden');
+            document.getElementById('title').classList.add('hidden');
+            
+            document.getElementById('themeBadge').textContent = currentTheme;
+            document.getElementById('difficultyBadge').textContent = difficulty.charAt(0).toUpperCase() + difficulty.slice(1);
+            document.getElementById('questionText').textContent = questions[currentTheme][difficulty];
+        }
+
+        function launchMemory() {
+            const timer = document.getElementById('memoryTimer');
+            const imageContainer = document.getElementById('memoryImageContainer');
+            const img = document.getElementById('memoryImg');
+            const btn = document.getElementById('launchBtn');
+            
+            // Cacher le bouton
+            btn.classList.add('hidden');
+            
+            // Charger une image aléatoire
+            img.src = 'quiz.png';
+            
+            // Afficher l'image et le timer
+            timer.classList.remove('hidden');
+            imageContainer.classList.remove('hidden');
+            
+            // Démarrer le compte à rebours
+            let timeLeft = 30;
+            timer.textContent = timeLeft;
+            
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+            
+            timerInterval = setInterval(function() {
+                timeLeft--;
+                timer.textContent = timeLeft;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    timer.classList.add('hidden');
+                    imageContainer.classList.add('hidden');
+                    btn.classList.remove('hidden');
+                }
+            }, 1000);
+        }
+
+        function goBackToMenu() {
+            // Arrêter le timer
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            
+            // Réinitialiser le jeu mémoire
+            document.getElementById('memoryTimer').classList.add('hidden');
+            document.getElementById('memoryImageContainer').classList.add('hidden');
+            document.getElementById('launchBtn').classList.remove('hidden');
+            
+            // Cacher tous les écrans
+            document.getElementById('themes').classList.add('hidden');
+            document.getElementById('difficulty').classList.add('hidden');
+            document.getElementById('question').classList.add('hidden');
+            document.getElementById('memoryGame').classList.add('hidden');
+            
+            // Afficher le menu
+            document.getElementById('mainMenu').classList.remove('hidden');
+            document.getElementById('title').classList.remove('hidden');
+            document.getElementById('title').textContent = 'Choisissez votre jeu';
+            
+            currentTheme = '';
+            currentDifficulty = '';
+        }
+    </script>
+</body>
+</html>
