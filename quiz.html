@@ -142,75 +142,70 @@
             margin-bottom: 15px;
         }
 
-        .fullscreen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: black;
-            z-index: 9999;
+        /* Styles pour la roulette */
+        .roulette-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .roulette-wheel {
+            width: 300px;
+            height: 300px;
+            border: 10px solid #667eea;
+            border-radius: 50%;
+            margin: 0 auto 30px;
             display: flex;
             align-items: center;
             justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transition: transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+            position: relative;
         }
 
-        .fullscreen img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-        }
-
-        .timer {
-            position: fixed;
-            top: 30px;
-            right: 30px;
-            background: rgba(102, 126, 234, 0.95);
-            color: white;
-            font-size: 3em;
+        .roulette-word {
+            font-size: 2em;
             font-weight: bold;
-            padding: 20px 40px;
-            border-radius: 20px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
-            z-index: 10000;
-        }
-        .fullscreen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: black;
-            z-index: 9999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .fullscreen img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-        }
-
-        .timer {
-            position: fixed;
-            top: 30px;
-            right: 30px;
-            background: rgba(102, 126, 234, 0.95);
             color: white;
-            font-size: 3em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .roulette-result {
+            font-size: 1.5em;
+            color: #667eea;
             font-weight: bold;
-            padding: 20px 40px;
-            border-radius: 20px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
-            z-index: 10000;
+            margin: 20px 0;
+            min-height: 40px;
+        }
+
+        .spin-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.2em;
+            transition: all 0.3s ease;
+            margin: 10px;
+            font-weight: bold;
+        }
+
+        .spin-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.5);
+        }
+
+        .spin-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1 id="title">Selectionnez le jeu</h1>
+        <h1 id="title">Sélectionnez le jeu</h1>
         
         <!-- Menu principal -->
         <div id="mainMenu" class="grid">
@@ -222,24 +217,28 @@
                 <h2>🧠 Mémoire</h2>
                 <p>Mémorisez les personnages en 30s</p>
             </div>
+            <div class="card" onclick="showRouletteGame()">
+                <h2>🎬 Roulette</h2>
+                <p>Mimez un mot de cinéma</p>
+            </div>
         </div>
         
         <!-- Quiz - Thématiques -->
         <div id="themes" class="grid hidden">
             <div class="card" onclick="selectTheme('Fantaisie')">
-                <h2>Fantaisie</h2>
-                <p>Ouuuh magiques, mythiques ou surnaturels !!</p>
+                <h2>✨ Fantaisie</h2>
+                <p>Univers magiques, mythiques ou surnaturels !</p>
             </div>
             <div class="card" onclick="selectTheme('anime')">
-                <h2>Héros en jaune…</h2>
+                <h2>🎨 Héros en jaune...</h2>
                 <p>Univers hauts en couleur</p>
             </div>
             <div class="card" onclick="selectTheme('feuilleton')">
-                <h2>Le feuilleton moderne</h2>
-                <p>Vue et revue</p>
+                <h2>📺 Le feuilleton moderne</h2>
+                <p>Vues et revues</p>
             </div>
             <div class="card" onclick="selectTheme('Culture')">
-                <h2>Cultissime</h2>
+                <h2>🎬 Cultissime</h2>
                 <p>Easy ou pas</p>
             </div>
         </div>
@@ -267,6 +266,11 @@
                 <span class="badge" id="difficultyBadge"></span>
                 <h2>Question</h2>
                 <div class="question-text" id="questionText"></div>
+                <div id="answerSection" class="hidden" style="background: #f0f7ff; padding: 20px; border-radius: 10px; margin: 20px 0; border-left: 4px solid #667eea;">
+                    <strong style="color: #667eea;">Réponse :</strong>
+                    <p id="answerText" style="font-size: 1.2em; color: #333; margin-top: 10px;"></p>
+                </div>
+                <button class="back-btn" id="showAnswerBtn" onclick="showAnswer()">💡 Afficher la réponse</button>
                 <button class="back-btn" onclick="goBackToMenu()">← Retour au menu</button>
             </div>
         </div>
@@ -275,7 +279,7 @@
         <div id="memoryGame" class="hidden">
             <div class="question-card">
                 <h2>🧠 Jeu de Mémoire</h2>
-                <p style="color: #666; margin-bottom: 30px;">Une grille avec 30 personnages va etre afficher, le but est de mémorisez tous les personnages, chacun sont tour vous devez dire un personnages, un oublie perdu, une erreur perdu.</p>
+                <p style="color: #666; margin-bottom: 30px;">Une grille avec 30 personnages va être affichée. Le but est de mémoriser tous les personnages. Chacun à son tour, vous devez citer un personnage. Un oubli = perdu, une erreur = perdu.</p>
                 
                 <div id="memoryTimer" class="hidden" style="font-size: 2em; color: #667eea; font-weight: bold; text-align: center; margin: 20px 0;">30</div>
                 
@@ -289,33 +293,115 @@
                 </div>
             </div>
         </div>
+
+        <!-- Jeu Roulette -->
+        <div id="rouletteGame" class="hidden">
+            <div class="question-card">
+                <h2>🎬 Roulette Cinéma</h2>
+                <p style="color: #666; margin-bottom: 30px;">Lancez la roulette et mimez le mot qui apparaît ! Les autres joueurs doivent deviner.</p>
+                
+                <div class="roulette-container">
+                    <div class="roulette-wheel" id="rouletteWheel">
+                        <div class="roulette-word" id="rouletteWord">🎬</div>
+                    </div>
+                    
+                    <div class="roulette-result" id="rouletteResult"></div>
+                    
+                    <button class="spin-btn" id="spinBtn" onclick="spinRoulette()">🎲 Lancer la roulette</button>
+                </div>
+                
+                <div style="text-align: center;">
+                    <button class="back-btn" onclick="goBackToMenu()">← Retour au menu</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
         let currentTheme = '';
         let currentDifficulty = '';
         let timerInterval = null;
+        let isSpinning = false;
+
+        const cinemaWords = [
+            "Roi-lion",
+            "Spok",
+            "Caméra",
+            "Popcorn",
+            "Oscar",
+            "Vampire",
+            "Zombie",
+            "Super-héros",
+            "Princesse",
+            "titanic",
+            "horreur",
+            "Simpson",
+            "Matrix",
+            "Clap action",
+            "Harry-potter",
+            "Monstre",
+            "Extraterrestre",
+            "Cowboy",
+            "Espion",
+            "Dinosaure"
+        ];
 
         const questions = {
             'Fantaisie': {
-                'facile': "Dans quel univers fantastique un petit groupe composé d’un roi, d’un magicien, d’un elfe, d’un nain....",
-                'moyen': "Harry Potter - Quel sort permet d’ouvrir une porte ou un coffre verrouillé ?",
-                'difficile': "Seigneur des Anneaux - Quel est le véritable nom de Gollum avant qu’il ne devienne corrompu par l’Anneau ?"
+                'facile': {
+                    question: "Dans quel univers fantastique un petit groupe composé d'un roi, d'un magicien, d'un elfe, d'un nain part en quête ?",
+                    reponse: "Le Seigneur des Anneaux"
+                },
+                'moyen': {
+                    question: "Harry Potter - Quel sort permet d'ouvrir une porte ou un coffre verrouillé ?",
+                    reponse: "Alohomora"
+                },
+                'difficile': {
+                    question: "Seigneur des Anneaux - Quel est le véritable nom de Gollum avant qu'il ne devienne corrompu par l'Anneau ?",
+                    reponse: "Sméagol"
+                }
             },
             'anime': {
-                'facile': "Bob l’Éponge - Comment s’appelle l’animal de compagnie de Bob l’Éponge ?",
-                'moyen': "Les Simpson - Comment s’appelle la ville où vivent Les Simpson ?",
-                'difficile': "Futurama - Quel est le métier de Leela au sein de l’équipage du Planet Express ?"
+                'facile': {
+                    question: "Bob l'Éponge - Comment s'appelle l'animal de compagnie de Bob l'Éponge ?",
+                    reponse: "Gary"
+                },
+                'moyen': {
+                    question: "Les Simpson - Comment s'appelle la ville où vivent Les Simpson ?",
+                    reponse: "Springfield"
+                },
+                'difficile': {
+                    question: "Futurama - Quel est le métier de Leela au sein de l'équipage du Planet Express ?",
+                    reponse: "Pilote"
+                }
             },
             'feuilleton': {
-                'facile': "Friends - Quel est le métier de Ross ?",
-                'moyen': "Breaking Bad - Quel est le pseudonyme utilisé par Walter White ?",
-                'difficile': "Malcom - Quel est le nom de la première petite amie de Malcolm ?"
+                'facile': {
+                    question: "Friends - Quel est le métier de Ross ?",
+                    reponse: "Paléontologue"
+                },
+                'moyen': {
+                    question: "Breaking Bad - Quel est le pseudonyme utilisé par Walter White ?",
+                    reponse: "Heisenberg"
+                },
+                'difficile': {
+                    question: "Malcolm - Quel est le nom de la première petite amie de Malcolm ?",
+                    reponse: "Kathy"
+                }
             },
             'Culture': {
-                'facile': "Top Gun - Quel est le prénom du personnage principal joué par Tom Cruise ?",
-                'moyen': "Philadelphia - Quelle maladie est au centre du conflit professionnel d'Andrew Beckett ?",
-                'difficile': "Dans quel film de science-fiction de 1999 un homme découvre que la réalité n’est qu’une simulation ?"
+                'facile': {
+                    question: "Top Gun - Quel est le prénom du personnage principal joué par Tom Cruise ?",
+                    reponse: "Pete (Maverick)"
+                },
+                'moyen': {
+                    question: "Philadelphia - Quelle maladie est au centre du conflit professionnel d'Andrew Beckett ?",
+                    reponse: "Le SIDA"
+                },
+                'difficile': {
+                    question: "Dans quel film de science-fiction de 1999 un homme découvre que la réalité n'est qu'une simulation ?",
+                    reponse: "Matrix"
+                }
             }
         };
 
@@ -328,6 +414,12 @@
         function showMemoryGame() {
             document.getElementById('mainMenu').classList.add('hidden');
             document.getElementById('memoryGame').classList.remove('hidden');
+            document.getElementById('title').classList.add('hidden');
+        }
+
+        function showRouletteGame() {
+            document.getElementById('mainMenu').classList.add('hidden');
+            document.getElementById('rouletteGame').classList.remove('hidden');
             document.getElementById('title').classList.add('hidden');
         }
 
@@ -346,7 +438,21 @@
             
             document.getElementById('themeBadge').textContent = currentTheme;
             document.getElementById('difficultyBadge').textContent = difficulty.charAt(0).toUpperCase() + difficulty.slice(1);
-            document.getElementById('questionText').textContent = questions[currentTheme][difficulty];
+            document.getElementById('questionText').textContent = questions[currentTheme][difficulty].question;
+            
+            // Cacher la réponse au départ
+            document.getElementById('answerSection').classList.add('hidden');
+            document.getElementById('showAnswerBtn').classList.remove('hidden');
+        }
+
+        function showAnswer() {
+            const answerSection = document.getElementById('answerSection');
+            const answerText = document.getElementById('answerText');
+            const showAnswerBtn = document.getElementById('showAnswerBtn');
+            
+            answerText.textContent = questions[currentTheme][currentDifficulty].reponse;
+            answerSection.classList.remove('hidden');
+            showAnswerBtn.classList.add('hidden');
         }
 
         function launchMemory() {
@@ -358,7 +464,7 @@
             // Cacher le bouton
             btn.classList.add('hidden');
             
-            // Charger une image aléatoire
+            // Charger votre image locale
             img.src = 'quiz.png';
             
             // Afficher l'image et le timer
@@ -398,19 +504,68 @@
             document.getElementById('memoryImageContainer').classList.add('hidden');
             document.getElementById('launchBtn').classList.remove('hidden');
             
+            // Réinitialiser la roulette
+            document.getElementById('rouletteWord').textContent = '🎬';
+            document.getElementById('rouletteResult').textContent = '';
+            document.getElementById('spinBtn').disabled = false;
+            isSpinning = false;
+            
             // Cacher tous les écrans
             document.getElementById('themes').classList.add('hidden');
             document.getElementById('difficulty').classList.add('hidden');
             document.getElementById('question').classList.add('hidden');
             document.getElementById('memoryGame').classList.add('hidden');
+            document.getElementById('rouletteGame').classList.add('hidden');
             
             // Afficher le menu
             document.getElementById('mainMenu').classList.remove('hidden');
             document.getElementById('title').classList.remove('hidden');
-            document.getElementById('title').textContent = 'Choisissez votre jeu';
+            document.getElementById('title').textContent = 'Sélectionnez le jeu';
             
             currentTheme = '';
             currentDifficulty = '';
+        }
+
+        function spinRoulette() {
+            if (isSpinning) return;
+            
+            isSpinning = true;
+            const wheel = document.getElementById('rouletteWheel');
+            const wordDisplay = document.getElementById('rouletteWord');
+            const result = document.getElementById('rouletteResult');
+            const spinBtn = document.getElementById('spinBtn');
+            
+            // Désactiver le bouton
+            spinBtn.disabled = true;
+            result.textContent = '';
+            
+            // Animation de rotation de la roue
+            const rotations = 5 + Math.random() * 3;
+            wheel.style.transform = `rotate(${rotations * 360}deg)`;
+            
+            // Défilement rapide des mots
+            let counter = 0;
+            const totalSpins = 30; // Nombre de changements de mots
+            const spinInterval = setInterval(() => {
+                const randomWord = cinemaWords[Math.floor(Math.random() * cinemaWords.length)];
+                wordDisplay.textContent = randomWord;
+                counter++;
+                
+                if (counter >= totalSpins) {
+                    clearInterval(spinInterval);
+                    
+                    // Choisir le mot final
+                    const finalWord = cinemaWords[Math.floor(Math.random() * cinemaWords.length)];
+                    wordDisplay.textContent = finalWord;
+                    
+                    setTimeout(() => {
+                        result.textContent = `À vous de mimer : ${finalWord} !`;
+                        wheel.style.transform = 'rotate(0deg)';
+                        spinBtn.disabled = false;
+                        isSpinning = false;
+                    }, 500);
+                }
+            }, 80); // Changement toutes les 80ms pour un défilement rapide
         }
     </script>
 </body>
